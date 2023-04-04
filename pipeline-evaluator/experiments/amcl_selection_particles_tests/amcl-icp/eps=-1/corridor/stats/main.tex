@@ -1,0 +1,227 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage{fontspec}
+\usepackage{amsmath,bm}
+\usepackage{amssymb}
+\usepackage[hidelinks]{hyperref}
+\usepackage[normalem]{ulem}
+\usepackage{float}
+\usepackage{xcolor}
+
+\title{Progress Report \\ 2019-05-13}
+
+\begin{document}
+\maketitle
+\date{}
+
+
+Parameters:
+\texttt{resample\_interval = $5$}, $N_{min} = 200$, $N_{max}$ = $500$.\\
+In the tables below: \texttt{amcl}'s figures are in black; the scan-matcher's
+are in gray. Particles are selected as follows: either the top $100,50,10 \%$
+of particles is selected, or the heaviest, or those whose weight is
+larger than the mean weight of all particles.
+
+\section{\texttt{amcl}$-$\texttt{icp}}
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection         & loop  & MAE-$x$ [m]                    & MAE-$y$ [m]                    & MAE-$d$ [m]                   & MAE-$\theta$ [rad]            & MAE                          & r$_i$  & r$_o$ \\ \hline
+    $100$ \%          & open  & $0.010803$                     & $0.010231$                     & $0.017096$                    & $0.0040694$                   & $0.0179824$                  & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0081967$}  & \textcolor{gray}{$0.0073292$}  & \textcolor{gray}{$0.012116$}  & \textcolor{gray}{$0.0037554$} & \textcolor{gray}{$0.013517$} & $$   & $$ \\
+    $50$ \%           & open  & $0.0099817$                    & $0.0096002$                    & $0.015927$                    & $0.0038163$                   & $0.016756$                   & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0081745$}  & \textcolor{gray}{$0.0073522$}  & \textcolor{gray}{$0.012135$}  & \textcolor{gray}{$0.0036716$} & \textcolor{gray}{$0.013488$} & $$   & $$ \\
+    $10$ \%           & open  & $0.011603$                     & $0.0094427$                    & $0.017139$                    & $0.0040415$                   & $0.018045$                   & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0079522$}  & \textcolor{gray}{$0.0072911$}  & \textcolor{gray}{$0.011926$}  & \textcolor{gray}{$0.0036991$} & \textcolor{gray}{$0.013309$} & $$   & $$ \\
+    top               & open  & $0.01181$                      & $0.010808$                     & $0.017952$                    & $0.0056752$                   & $0.019515$                   & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0080277$}  & \textcolor{gray}{$0.0072761$}  & \textcolor{gray}{$0.011933$}  & \textcolor{gray}{$0.003729$}  & \textcolor{gray}{$0.013302$} & $$   & $$ \\
+    $> \overline{W}$  & open  & $0.010096$                     & $0.0098264$                    & $0.016262$                    & $0.0038285$                   & $0.017081$                   & $$   & $$ \\
+                      &       & \textcolor{gray}{$0.0082079$}  & \textcolor{gray}{$0.007338$}   & \textcolor{gray}{$0.012131$}  & \textcolor{gray}{$0.00368$}   & \textcolor{gray}{$0.013474$} & $$   & $$ \\
+  \end{tabular}
+  \caption{Open-loop mean absolute pose errors per selection percentage.
+           Header: selection: type of selection of particles off \texttt{amcl}
+           for outputting the final pose; \texttt{loop}: open;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise errors, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop    & MAE-$x$ [m]                    & MAE-$y$ [m]                    & MAE-$d$ [m]                  & MAE-$\theta$ [rad]            & MAE                           & r$_i$   & r$_o$ \\ \hline
+    $100$ \%         & soft-1  & $0.007905$                     & $0.0072522$                    & $0.011817$                   & $0.0037748$                   & $0.013101$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0080272$}  & \textcolor{gray}{$0.0071392$}  & \textcolor{gray}{$0.011805$} & \textcolor{gray}{$0.0042586$} & \textcolor{gray}{$0.013517$}  & $$    & $$  \\
+    $50$ \%          & soft-1  & $0.0078921$                    & $0.0072208$                    & $0.011769$                   & $0.0037277$                   & $0.013044$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0080932$}  & \textcolor{gray}{$0.0070838$}  & \textcolor{gray}{$0.011807$} & \textcolor{gray}{$0.0042712$} & \textcolor{gray}{$0.013528$}  & $$    & $$  \\
+    $10$ \%          & soft-1  & $0.0079335$                    & $0.0072417$                    & $0.011849$                   & $0.0038619$                   & $0.013185$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0079803$}  & \textcolor{gray}{$0.007102$}   & \textcolor{gray}{$0.01172$}  & \textcolor{gray}{$0.0043049$} & \textcolor{gray}{$0.013456$}  & $$    & $$  \\
+    top              & soft-1  & $0.0081511$                    & $0.0072985$                    & $0.01207$                    & $0.0042183$                   & $0.013606$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0081199$}  & \textcolor{gray}{$0.0070991$}  & \textcolor{gray}{$0.011836$} & \textcolor{gray}{$0.0042144$} & \textcolor{gray}{$0.013517$}  & $$    & $$  \\
+    $> \overline{W}$ & soft-1  & $0.0079498$                    & $0.0072665$                    & $0.011875$                   & $0.0038296$                   & $0.013188$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0080495$}  & \textcolor{gray}{$0.0071206$}  & \textcolor{gray}{$0.011809$} & \textcolor{gray}{$0.0041989$} & \textcolor{gray}{$0.013472$}  & $$    & $$  \\
+  \end{tabular}
+  \caption{Soft-closed mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: soft-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop     & MAE-$x$ [m]                    & MAE-$y$ [m]                    & MAE-$d$ [m]                   & MAE-$\theta$ [rad]            & MAE                           & r$_i$   & r$_o$ \\ \hline
+    $100$ \%         & soft-50  & $0.0078379$                    & $0.0072797$                    & $0.01182$                     & $0.0039201$                   & $0.013338$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0079403$}  & \textcolor{gray}{$0.0071694$}  & \textcolor{gray}{$0.011769$}  & \textcolor{gray}{$0.0043449$} & \textcolor{gray}{$0.013543$}  & $$    & $$  \\
+    $50$ \%          & soft-50  & $0.0078833$                    & $0.0071938$                    & $0.011783$                    & $0.0039812$                   & $0.013358$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0079931$}  & \textcolor{gray}{$0.0070734$}  & \textcolor{gray}{$0.011712$}  & \textcolor{gray}{$0.0044762$} & \textcolor{gray}{$0.013586$}  & $$    & $$  \\
+    $10$ \%          & soft-50  & $0.007684$                     & $0.0070832$                    & $0.011477$                    & $0.0033839$                   & $0.012685$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0079552$}  & \textcolor{gray}{$0.0071379$}  & \textcolor{gray}{$0.011748$}  & \textcolor{gray}{$0.0043497$} & \textcolor{gray}{$0.013535$}  & $$    & $$  \\
+    top              & soft-50  & $0.0074128$                    & $0.0069519$                    & $0.011088$                    & $0.0032546$                   & $0.012174$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0080416$}  & \textcolor{gray}{$0.0070744$}  & \textcolor{gray}{$0.011756$}  & \textcolor{gray}{$0.0043869$} & \textcolor{gray}{$0.013563$}  & $$    & $$  \\
+    $> \overline{W}$ & soft-50  & $0.0078438$                    & $0.0071938$                    & $0.011742$                    & $0.0040213$                   & $0.013337$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0080099$}  & \textcolor{gray}{$0.0070758$}  & \textcolor{gray}{$0.0117489$} & \textcolor{gray}{$0.0045428$} & \textcolor{gray}{$0.013663$}  & $$    & $$  \\
+  \end{tabular}
+  \caption{Soft-closed mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: soft-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop  & MAE-$x$ [m]                     & MAE-$y$ [m]                   & MAE-$d$ [m]                  & MAE-$\theta$ [rad]              & MAE                           & r$_i$  & r$_o$ \\ \hline
+    $100$ \%         & hard  & $0.0075889$                     & $0.0074509$                   & $0.011419$                   & $0.0050763$                     & $0.01348$                     & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0078075$}   & \textcolor{gray}{$0.007808$}  & \textcolor{gray}{$0.012045$} & \textcolor{gray}{$0.0042282$}   & \textcolor{gray}{$0.013691$}  & $$   & $$ \\
+    $50$ \%          & hard  & $0.007629$                      & $0.0074772$                   & $0.011475$                   & $0.0039996$                     & $0.0129$                      & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0078025$}   & \textcolor{gray}{$0.0078164$} & \textcolor{gray}{$0.012048$} & \textcolor{gray}{$0.0042842$}   & \textcolor{gray}{$0.013734$}  & $$   & $$ \\
+    $10$ \%          & hard  & $0.0073637$                     & $0.0074838$                   & $0.011321$                   & $0.0031504$                     & $0.0123017$                   & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0078071$}   & \textcolor{gray}{$0.0078654$} & \textcolor{gray}{$0.012099$} & \textcolor{gray}{$0.0041696$}   & \textcolor{gray}{$0.013708$}  & $$   & $$ \\
+    top              & hard  & $0.00717796$                    & $0.0074242$                   & $0.011202$                   & $0.002891$                      & $0.012034$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0077837$}   & \textcolor{gray}{$0.0077645$} & \textcolor{gray}{$0.011998$} & \textcolor{gray}{$0.0041828$}   & \textcolor{gray}{$0.013622$}  & $$   & $$ \\
+    $> \overline{W}$ & hard  & $0.0077409$                     & $0.0074716$                   & $0.011551$                   & $0.0046831$                     & $0.013322$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0078029$}   & \textcolor{gray}{$0.0078226$} & \textcolor{gray}{$0.012058$} & \textcolor{gray}{$0.0041962$}   & \textcolor{gray}{$0.01369$}   & $$   & $$ \\
+  \end{tabular}
+  \caption{Hard-closed-loop mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: hard-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise errors, and total error.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\section{\texttt{amcl}$-$\texttt{icp}$-$dft}
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection         & loop  & MAE-$x$ [m]                     & MAE-$y$ [m]                    & MAE-$d$ [m]                   & MAE-$\theta$ [rad]            & MAE                          & r$_i$  & r$_o$ \\ \hline
+    $100$ \%          & open  & $0.0096321$                     & $0.010278$                     & $0.016135$                    & $0.0040343$                   & $0.01704$                    & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0080118$}   & \textcolor{gray}{$0.0071215$}  & \textcolor{gray}{$0.011884$}  & \textcolor{gray}{$0.0036416$} & \textcolor{gray}{$0.013225$} & $$   & $$ \\
+    $50$ \%           & open  & $0.0087241$                     & $0.0093908$                    & $0.01472$                     & $0.0036341$                   & $0.015517$                   & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0080152$}   & \textcolor{gray}{$0.0071136$}  & \textcolor{gray}{$0.011887$}  & \textcolor{gray}{$0.0036049$} & \textcolor{gray}{$0.0132$}   & $$   & $$ \\
+    $10$ \%           & open  & $0.011$                         & $0.0095142$                    & $0.016653$                    & $0.0041056$                   & $0.017579$                   & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0079183$}   & \textcolor{gray}{$0.007014$}   & \textcolor{gray}{$0.011725$}  & \textcolor{gray}{$0.0036524$} & \textcolor{gray}{$0.013076$} & $$   & $$ \\
+    top               & open  & $0.011491$                      & $0.01053$                      &  $0.017437$                   & $0.0056225$                   & $0.01901$                    & $$   & $$ \\
+    &                         & \textcolor{gray}{$0.0078809$}   & \textcolor{gray}{$0.0070287$}  & \textcolor{gray}{$0.011697$}  & \textcolor{gray}{$0.0037298$} & \textcolor{gray}{$0.013079$} & $$   & $$ \\
+    $> \overline{W}$  & open  & $0.0092981$                     & $0.010004$                     & $0.015634$                    & $0.00382$                     & $0.016459$                   & $$   & $$ \\
+                      &       & \textcolor{gray}{$0.008017$}    & \textcolor{gray}{$0.0070626$}  & \textcolor{gray}{$0.011829$}  & \textcolor{gray}{$0.0036234$} & \textcolor{gray}{$0.013153$} & $$   & $$ \\
+  \end{tabular}
+  \caption{Open-loop mean absolute pose errors per selection percentage.
+           Header: selection: type of selection of particles off \texttt{amcl}
+           for outputting the final pose; \texttt{loop}: open;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise errors, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop    & MAE-$x$ [m]                    & MAE-$y$ [m]                     & MAE-$d$ [m]                   & MAE-$\theta$ [rad]            & MAE                           & r$_i$   & r$_o$ \\ \hline
+    $100$ \%         & soft-1  & $0.0081815$                    & $0.007195$                      & $0.012119$                    & $0.0033952$                   & $0.013163$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0078706$}  & \textcolor{gray}{$0.0069582$}   & \textcolor{gray}{$0.011592$}  & \textcolor{gray}{$0.0039716$} & \textcolor{gray}{$0.01312$}   & $$    & $$  \\
+    $50$ \%          & soft-1  & $0.0080638$                    & $0.007126$                      & $0.011953$                    & $0.003501$                    & $0.013077$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0079359$}  & \textcolor{gray}{$0.0069343$}   & \textcolor{gray}{$0.011627$}  & \textcolor{gray}{$0.0041265$} & \textcolor{gray}{$0.013258$}  & $$    & $$  \\
+    $10$ \%          & soft-1  & $0.0081969$                    & $0.0071684$                     & $0.012123$                    & $0.0034981$                   & $0.013228$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0079255$}  & \textcolor{gray}{$0.0069845$}   & \textcolor{gray}{$0.011673$}  & \textcolor{gray}{$0.0039399$} & \textcolor{gray}{$0.013186$}  & $$    & $$  \\
+    top              & soft-1  & $0.0080969$                    & $0.0071319$                     & $0.011966$                    & $0.0040708$                   & $0.0134156$                   & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0078646$}  & \textcolor{gray}{$0.0069332$}   & \textcolor{gray}{$0.011577$}  & \textcolor{gray}{$0.0040413$} & \textcolor{gray}{$0.01316$}   & $$    & $$  \\
+    $> \overline{W}$ & soft-1  & $0.0082008$                    & $0.0071381$                     & $0.012086$                    & $0.0036731$                   & $0.013298$                    & $$    & $$  \\
+                     &         & \textcolor{gray}{$0.0079611$}  & \textcolor{gray}{$0.0069353$}   & \textcolor{gray}{$0.01165$}   & \textcolor{gray}{$0.0041211$} & \textcolor{gray}{$0.013281$}  & $$    & $$  \\
+  \end{tabular}
+  \caption{Soft-closed mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: soft-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop     & MAE-$x$ [m]                    & MAE-$y$ [m]                    & MAE-$d$ [m]                   & MAE-$\theta$ [rad]            & MAE                           & r$_i$   & r$_o$ \\ \hline
+    $100$ \%         & soft-50  & $0.0078399$                    & $0.0070543$                    & $0.011702$                    & $0.0037685$                   & $0.013129$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0078301$}  & \textcolor{gray}{$0.0069371$}  & \textcolor{gray}{$0.011545$}  & \textcolor{gray}{$0.00421$}   & \textcolor{gray}{$0.013238$}  & $$    & $$  \\
+    $50$ \%          & soft-50  & $0.0078101$                    & $0.006994$                     & $0.011624$                    & $0.0038108$                   & $0.013086$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0078187$}  & \textcolor{gray}{$0.0069051$}  & \textcolor{gray}{$0.011509$}  & \textcolor{gray}{$0.0042582$} & \textcolor{gray}{$0.013234$}  & $$    & $$  \\
+    $10$ \%          & soft-50  & $0.0076206$                    & $0.006849$                     & $0.011311$                    & $0.0034307$                   & $0.012521$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0078827$}  & \textcolor{gray}{$0.006989$}   & \textcolor{gray}{$0.011627$}  & \textcolor{gray}{$0.0041357$} & \textcolor{gray}{$0.013275$}  & $$    & $$  \\
+    top              & soft-50  & $0.0073207$                    & $0.0067625$                    & $0.010946$                    & $0.0031944$                   & $0.011971$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0078201$}  & \textcolor{gray}{$0.0068962$}  & \textcolor{gray}{$0.011509$}  & \textcolor{gray}{$0.0042492$} & \textcolor{gray}{$0.013231$}  & $$    & $$  \\
+    $> \overline{W}$ & soft-50  & $0.0078232$                    & $0.0070273$                    & $0.011671$                    & $0.0037715$                   & $0.013102$                    & $$    & $$  \\
+                     &          & \textcolor{gray}{$0.0078289$}  & \textcolor{gray}{$0.0069171$}  & \textcolor{gray}{$0.01152$}   & \textcolor{gray}{$0.004273$}  & \textcolor{gray}{$0.01325$}   & $$    & $$  \\
+  \end{tabular}
+  \caption{Soft-closed mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: soft-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise, and total errors.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+
+\begin{table}[H]\centering
+  \begin{tabular}{cc|ccccc|rr}
+    selection        & loop  & MAE-$x$ [m]                     & MAE-$y$ [m]                    & MAE-$d$ [m]                  & MAE-$\theta$ [rad]              & MAE                           & r$_i$  & r$_o$ \\ \hline
+    $100$ \%         & hard  & $0.0074517$                     & $0.0071074$                    & $0.011093$                   & $0.0056152$                     & $0.013533$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0077245$}   & \textcolor{gray}{$0.0076191$}  & \textcolor{gray}{$0.011903$} & \textcolor{gray}{$0.0041661$}   & \textcolor{gray}{$0.013527$}  & $$   & $$ \\
+    $50$ \%          & hard  & $0.0074587$                     & $0.0071535$                    & $0.011112$                   & $0.0041804$                     & $0.012665$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0077074$}   & \textcolor{gray}{$0.0076137$}  & \textcolor{gray}{$0.011876$} & \textcolor{gray}{$0.0040936$}   & \textcolor{gray}{$0.013448$}  & $$   & $$ \\
+    $10$ \%          & hard  & $0.0072978$                     & $0.0071982$                    & $0.011059$                   & $0.0033318$                     & $0.012143$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0076677$}   & \textcolor{gray}{$0.007596$}   & \textcolor{gray}{$0.01184$}  & \textcolor{gray}{$0.0041081$}   & \textcolor{gray}{$0.013428$}  & $$   & $$ \\
+    top              & hard  & $0.007142$                      & $0.007338$                     & $0.011100$                   & $0.002941$                      & $0.011955$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.007676$}    & \textcolor{gray}{$0.007549$}   & \textcolor{gray}{$0.011805$} & \textcolor{gray}{$0.004147$}    & \textcolor{gray}{$0.013413$}  & $$   & $$ \\
+    $> \overline{W}$ & hard  & $0.0075614$                     & $0.0070672$                    & $0.011158$                   & $0.0051469$                     & $0.013282$                    & $$   & $$ \\
+                     &       & \textcolor{gray}{$0.0077382$}   & \textcolor{gray}{$0.0075824$}  & \textcolor{gray}{$0.011881$} & \textcolor{gray}{$0.0042171$}   & \textcolor{gray}{$0.013531$}   & $$   & $$ \\
+  \end{tabular}
+  \caption{Hard-closed-loop mean absolute pose errors per selection percentage.
+           Header: $\%$ particles selected for
+           averaging the final pose; \texttt{loop}: hard-closed;
+           $x-$wise, $y-$wise, distance-wise, orientation-wise errors, and total error.
+           r$_i$ is the rank of a configuration internal to this loop-closure
+           regime. r$_o$ is the rank of a configuration across all loop-closure
+           regimes.
+           }
+\end{table}
+
+\end{document}

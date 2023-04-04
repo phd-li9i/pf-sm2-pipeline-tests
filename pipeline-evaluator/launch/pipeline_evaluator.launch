@@ -1,0 +1,33 @@
+<launch>
+
+  <arg name="gazebo_world" />
+  <arg name="use_bag" />
+  <arg name="goal_x" />
+  <arg name="goal_y" />
+  <arg name="goal_yaw" />
+
+  <node name="logger_node" pkg="pipeline_evaluator" type="logger_node" output="screen">
+    <param name="ground_truth_filename"         value="$(find pipeline_evaluator)/experiments/ground_truth" />
+    <param name="amcl_pose_filename"            value="$(find pipeline_evaluator)/experiments/amcl_pose" />
+    <param name="icp_corrected_pose_filename"   value="$(find pipeline_evaluator)/experiments/icp_corrected_pose" />
+    <param name="dft_corrected_pose_filename"   value="$(find pipeline_evaluator)/experiments/dft_corrected_pose" />
+    <param name="execution_times_filename"      value="$(find pipeline_evaluator)/experiments/execution_times" />
+    <param name="map_filename"                  value="$(find pipeline_evaluator)/experiments/map_filename" />
+
+    <param name="map_name"                      value="$(arg gazebo_world)" />
+
+    <param name="send_goal"                     value="true"  if="$(eval use_bag == false)" />
+    <param name="send_goal"                     value="false" if="$(eval use_bag == true)" />
+    <param name="goal_x"                        value="$(arg goal_x)" />
+    <param name="goal_y"                        value="$(arg goal_y)" />
+    <param name="goal_yaw"                      value="$(arg goal_yaw)" />
+
+    <param name="amcl_pose_topic"               value="/amcl_pose" />
+    <param name="ground_truth_topic"            value="/relief_pipeline_localisation_node/ground_truth" />
+    <param name="icp_corrected_pose_topic"      value="/relief_pipeline_localisation_node/icp_corrected_pose" />
+    <param name="dft_corrected_pose_topic"      value="/relief_pipeline_localisation_node/corrected_pose" />
+    <param name="execution_times_topic"         value="/relief_pipeline_localisation_node/execution_times" />
+    <param name="map_topic"                     value="/map" />
+  </node>
+
+</launch>

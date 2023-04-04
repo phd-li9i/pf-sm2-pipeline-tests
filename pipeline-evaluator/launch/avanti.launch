@@ -1,0 +1,123 @@
+<launch>
+
+  <!-- corridor | willowgarage-->
+  <arg name="gazebo_world"  default="warehouse_karto" />
+
+  <!-- true | false -->
+  <arg name="gazebo_gui"    default="false" />
+
+  <!-- turtlebot | rb1-->
+  <arg name="robot_type"    default="rb1" />
+
+  <!-- navfn | globalplanner | sbpl -->
+  <arg name="gp"            value="globalplanner" />
+
+  <!-- dwa | eband | teb -->
+  <arg name="lp"            value="teb" />
+
+  <!-- exploration is unnecessary -->
+  <arg name="use_explorer"  value="false" />
+
+  <!-- visualisation is not necessarily necessary -->
+  <arg name="do_viz"        default="false" />
+
+  <!-- Use bag or live simulation -->
+  <arg name="use_bag"       default="false" />
+
+
+  <!-- launch world, robot, etc -->
+  <group unless="$(arg use_bag)">
+    <include file="$(find relief_devel)/launch/avanti_simulation.launch">
+      <arg name="gazebo_world"  value="$(arg gazebo_world)" />
+      <arg name="gazebo_gui"    value="$(arg gazebo_gui)" />
+      <arg name="robot_type"    value="$(arg robot_type)" />
+      <arg name="gp"            value="$(arg gp)" />
+      <arg name="lp"            value="$(arg lp)" />
+      <arg name="use_explorer"  value="$(arg use_explorer)" />
+      <arg name="do_viz"        value="$(arg do_viz)" />
+    </include>
+  </group>
+
+  <group if="$(arg use_bag)">
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(find pipeline_evaluator)/bags/$(arg robot_type)_$(arg gazebo_world).bag" />
+
+    <arg name="initial_pose_x"   value="11.56"   if="$(eval gazebo_world == 'corridor')" />
+    <arg name="initial_pose_y"   value="12.2"    if="$(eval gazebo_world == 'corridor')" />
+    <arg name="initial_pose_yaw" value="0.0"     if="$(eval gazebo_world == 'corridor')" />
+
+    <include file="$(find relief_devel)/launch/localisation/amcl.launch">
+      <arg name="robot_type"        value="$(arg robot_type)" />
+
+      <arg name="initial_pose_x"    value="$(arg initial_pose_x)" />
+      <arg name="initial_pose_y"    value="$(arg initial_pose_y)" />
+      <arg name="initial_pose_yaw"  value="$(arg initial_pose_yaw)" />
+    </include>
+
+    <node name="rviz" pkg="rviz" type="rviz" output="log" args="-d $(find relief_devel)/configuration_files/rviz/relief_devel_$(arg gp)_$(arg lp).rviz" if="$(arg do_viz)" />
+  </group>
+
+
+  <!-- Execute pipeline -->
+  <include file="$(find relief_pipeline_localisation)/launch/relief_pipeline_localisation.launch">
+    <arg name="gazebo_world"                  value="$(arg gazebo_world)" />
+    <arg name="robot_type"                    value="$(arg robot_type)" />
+  </include>
+
+
+  <!-- Goals per map -->
+  <arg name="goal_x"                        value="5"     if="$(eval gazebo_world == 'corridor')"/>
+  <arg name="goal_y"                        value="6"     if="$(eval gazebo_world == 'corridor')"/>
+  <arg name="goal_yaw"                      value="0.0"   if="$(eval gazebo_world == 'corridor')"/>
+
+  <arg name="goal_x"                        value="58.0"  if="$(eval gazebo_world == 'willowgarage')"/>
+  <arg name="goal_y"                        value="45.0"  if="$(eval gazebo_world == 'willowgarage')"/>
+  <arg name="goal_yaw"                      value="1.57"  if="$(eval gazebo_world == 'willowgarage')"/>
+
+  <arg name="goal_x"                        value="11.4"  if="$(eval gazebo_world == 'square')"/>
+  <arg name="goal_y"                        value="11.4"  if="$(eval gazebo_world == 'square')"/>
+  <arg name="goal_yaw"                      value="0.00"  if="$(eval gazebo_world == 'square')"/>
+
+  <arg name="goal_x"                        value="15.24" if="$(eval gazebo_world == 'rectangle')"/>
+  <arg name="goal_y"                        value="11.24" if="$(eval gazebo_world == 'rectangle')"/>
+  <arg name="goal_yaw"                      value="0.00"  if="$(eval gazebo_world == 'rectangle')"/>
+
+  <arg name="goal_x"                        value="12.2"  if="$(eval gazebo_world == 'rectangle_long')"/>
+  <arg name="goal_y"                        value="14.6"  if="$(eval gazebo_world == 'rectangle_long')"/>
+  <arg name="goal_yaw"                      value="0.00"  if="$(eval gazebo_world == 'rectangle_long')"/>
+
+  <arg name="goal_x"                        value="22.2"  if="$(eval gazebo_world == 'triangle')"/>
+  <arg name="goal_y"                        value="11.4"  if="$(eval gazebo_world == 'triangle')"/>
+  <arg name="goal_yaw"                      value="0.00"  if="$(eval gazebo_world == 'triangle')"/>
+
+  <arg name="goal_x"                        value="21.0"  if="$(eval gazebo_world == 'gamma')"/>
+  <arg name="goal_y"                        value="12.2"  if="$(eval gazebo_world == 'gamma')"/>
+  <arg name="goal_yaw"                      value="0.00"  if="$(eval gazebo_world == 'gamma')"/>
+
+  <arg name="goal_x"                        value="2.613582"    if="$(eval gazebo_world == 'home_karto')"/>
+  <arg name="goal_y"                        value="2.422026"    if="$(eval gazebo_world == 'home_karto')"/>
+  <arg name="goal_yaw"                      value="-2.6"  if="$(eval gazebo_world == 'home_karto')"/>
+
+  <arg name="goal_x"                        value="40"        if="$(eval gazebo_world == 'warehouse_karto')"/>
+  <arg name="goal_y"                        value="15"        if="$(eval gazebo_world == 'warehouse_karto')"/>
+  <arg name="goal_yaw"                      value="0.0"       if="$(eval gazebo_world == 'warehouse_karto')"/>
+
+  <arg name="goal_x"                        value="8.58615"   if="$(eval gazebo_world  == 'cylinder')" />
+  <arg name="goal_y"                        value="9.976414"  if="$(eval gazebo_world  == 'cylinder')" />
+  <arg name="goal_yaw"                      value="0.00"      if="$(eval gazebo_world  == 'cylinder')" />
+
+  <!--
+  <arg name="goal_x"                        value="12.08319"  if="$(eval gazebo_world == 'warehouse_karto')"/>
+  <arg name="goal_y"                        value="3.015576"  if="$(eval gazebo_world == 'warehouse_karto')"/>
+  <arg name="goal_yaw"                      value="0.0"       if="$(eval gazebo_world == 'warehouse_karto')"/>
+  -->
+
+  <!-- Launch logger -->
+  <include file="$(find pipeline_evaluator)/launch/pipeline_evaluator.launch">
+    <arg name="gazebo_world"                value="$(arg gazebo_world)" />
+    <arg name="use_bag"                     value="$(arg use_bag)" />
+    <arg name="goal_x"                      value="$(arg goal_x)" />
+    <arg name="goal_y"                      value="$(arg goal_y)" />
+    <arg name="goal_yaw"                    value="$(arg goal_yaw)" />
+  </include>
+
+</launch>
